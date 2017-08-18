@@ -1,14 +1,10 @@
 import {window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
 
-// this method is called when your extension is activated. activation is
-// controlled by the activation events defined in package.json
 export function activate(ctx: ExtensionContext) {
 
     let wordCounter = new WordCounter();
     let controller = new WordCounterController(wordCounter);
 
-    // add to a list of disposables which are disposed when this extension
-    // is deactivated again.
     ctx.subscriptions.push(controller);
     ctx.subscriptions.push(wordCounter);
 }
@@ -19,12 +15,10 @@ export class WordCounter {
 
     public updateWordCount() {
         
-        // Create as needed
         if (!this._statusBarItem) {
             this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         } 
 
-        // Get the current text editor
         let editor = window.activeTextEditor;
         if (!editor) {
             this._statusBarItem.hide();
@@ -35,7 +29,6 @@ export class WordCounter {
 
         let wordCount = this._getWordCount(doc);
 
-        // Update the status bar
         this._statusBarItem.text = wordCount !== 1 ? `$(pencil) ${wordCount} Words` : '$(pencil) 1 Word';
         this._statusBarItem.show();
     }
@@ -43,7 +36,6 @@ export class WordCounter {
     public _getWordCount(doc: TextDocument): number {
         let docContent = doc.getText();
 
-        // Parse out unwanted whitespace so the split is accurate
         docContent = docContent.replace(/(< ([^>]+)<)/g, '').replace(/\s+/g, ' ');
         docContent = docContent.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
         let wordCount = 0;
@@ -68,12 +60,10 @@ class WordCounterController {
         this._wordCounter = wordCounter;
         this._wordCounter.updateWordCount();
 
-        // subscribe to selection change and editor activation events
         let subscriptions: Disposable[] = [];
         window.onDidChangeTextEditorSelection(this._onEvent, this, subscriptions);
         window.onDidChangeActiveTextEditor(this._onEvent, this, subscriptions);
 
-        // create a combined disposable from both event subscriptions
         this._disposable = Disposable.from(...subscriptions);
     }
 
