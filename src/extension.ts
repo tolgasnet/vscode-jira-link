@@ -2,14 +2,15 @@ import {window, workspace, commands, Disposable, ExtensionContext, StatusBarAlig
 var path = require('path');
 var getGitBranchName = require('git-branch-name');
 var opn = require('opn');
+var fs = require('fs');
 
 export function activate(ctx: ExtensionContext) {
 
-    let wordCounter = new JiraLink();
-    let controller = new WordCounterController(wordCounter);
+    let jiraLink = new JiraLink();
+    let controller = new JiraLinkController(jiraLink);
 
     ctx.subscriptions.push(controller);
-    ctx.subscriptions.push(wordCounter);
+    ctx.subscriptions.push(jiraLink);
 }
 
 export class JiraLink {
@@ -43,7 +44,7 @@ export class JiraLink {
                 });
 
                 this._statusBarItem.command = "extension.jiraLinkCommand";
-                this._statusBarItem.text = `$(tag) ${jiraStory.Name}`;
+                this._statusBarItem.text = `$(tag) JIRA`;
                 this._statusBarItem.show();
             });
     }
@@ -55,9 +56,30 @@ export class JiraLink {
             return { Name: "", Url: "" };
         }
         var storyNumber = match[1];
-        var jiraUrl = `https://myjirahost.atlassian.net/browse/${storyNumber}`;
 
-        return { Name: storyNumber, Url: jiraUrl };;
+        var configPath = this.getConfigPath();
+        this.readJson(configPath, (configValues: any) => {
+            window.showInformationMessage(configValues.test);
+        });
+        
+        var jiraUrl = `https://changeme.atlassian.net/browse/${storyNumber}`;
+
+        return { Name: storyNumber, Url: jiraUrl };
+    }
+
+    public getConfigPath(): string {
+        // todo 1: make it cross-platform
+        // todo 2: move it from project dir to OS user dir or .vscode folder
+        var workspacePath = workspace.workspaceFolders[0].uri.fsPath;
+        return `${workspacePath}\\jira-link-config.json`;
+    }
+
+    public readJson(path: string, done) {
+        var configValues;
+        fs.readFile(path, 'utf8', function (err, data) {
+            configValues = err ? "none" : JSON.parse(data); 
+            done(configValues);
+        });
     }
 
     public dispose() {
@@ -71,7 +93,7 @@ class JiraStory {
     public Name: string;
 }
 
-class WordCounterController {
+class JiraLinkController {
 
     private _jiraLink: JiraLink;
     private _disposable: Disposable;
