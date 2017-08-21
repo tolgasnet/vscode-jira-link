@@ -1,4 +1,6 @@
 import {window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
+var path = require('path');
+var getGitBranchName = require('git-branch-name');
 
 export function activate(ctx: ExtensionContext) {
 
@@ -24,24 +26,18 @@ export class WordCounter {
             this._statusBarItem.hide();
             return;
         }
-        
-        let doc = editor.document;
 
-        let wordCount = this._getWordCount(doc);
-
-        this._statusBarItem.text = wordCount !== 1 ? `$(pencil) ${wordCount} Words` : '$(pencil) 1 Word';
-        this._statusBarItem.show();
+        getGitBranchName(
+            path.resolve(__dirname, '../../'), 
+            (err, branchName) => {
+                var jiraUrl = this.getJiraUrl(branchName);
+                this._statusBarItem.text = `$(tag) ${jiraUrl}`;
+                this._statusBarItem.show();
+            });
     }
 
-    public _getWordCount(doc: TextDocument): number {
-        let docContent = doc.getText();
-
-        let wordCount = 0;
-        if (docContent != "") {
-            wordCount = docContent.split(" ").length;
-        }
-
-        return wordCount;
+    public getJiraUrl(branchName: string) : string {
+        return branchName;
     }
 
     public dispose() {
