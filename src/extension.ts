@@ -1,4 +1,4 @@
-import {window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument} from 'vscode';
+import { window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument, InputBoxOptions } from 'vscode';
 var path = require('path');
 var getGitBranchName = require('git-branch-name');
 var opn = require('opn');
@@ -6,7 +6,7 @@ var fs = require('fs');
 
 export function activate(ctx: ExtensionContext) {
 
-    let jiraLink = new JiraLink();
+    let jiraLink = new JiraLink(ctx);
     let controller = new JiraLinkController(jiraLink);
 
     ctx.subscriptions.push(controller);
@@ -17,6 +17,11 @@ export class JiraLink {
 
     private _statusBarItem: StatusBarItem;
     private _urlCommand: Disposable;
+    private _ctx: ExtensionContext;
+
+    constructor(ctx: ExtensionContext) {
+        this._ctx = ctx;
+    }
 
     public updateJiraLink() {
         
@@ -57,21 +62,22 @@ export class JiraLink {
         }
         var storyNumber = match[1];
 
-        var configPath = this.getConfigPath();
-        this.readJson(configPath, (configValues: any) => {
-            window.showInformationMessage(configValues.test);
-        });
-        
+        var jiraBaseUri = this._ctx.workspaceState.get<string>("jira-uri", "");
+        var self = this;
+        if (jiraBaseUri.length === 0) {
+            window
+                .showInputBox({ value: "JIRA host ie. https://mydomain.attlassian.net" })
+                .then<string>((value) => { 
+                    jiraBaseUri = value; 
+                    this._ctx.workspaceState.update("jira-uri", jiraBaseUri);
+                    window.showInformationMessage(jiraBaseUri);
+                    return value;
+                });
+        }
+
         var jiraUrl = `https://changeme.atlassian.net/browse/${storyNumber}`;
 
         return { Name: storyNumber, Url: jiraUrl };
-    }
-
-    public getConfigPath(): string {
-        // todo 1: make it cross-platform
-        // todo 2: move it from project dir to OS user dir or .vscode folder
-        var workspacePath = workspace.workspaceFolders[0].uri.fsPath;
-        return `${workspacePath}\\jira-link-config.json`;
     }
 
     public readJson(path: string, done) {
