@@ -1,6 +1,6 @@
 {
-  "name": "word-count",
-  "displayName": "word-count",
+  "name": "jira-link",
+  "displayName": "jira-link",
   "description": "",
   "version": "0.0.1",
   "publisher": "tolgasnet",
@@ -39,7 +39,6 @@
     "mocha": "^2.3.3",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0",
-    "opn": "^5.1.0",
-    "fs": "^0.0.1-security"
+    "opn": "^5.1.0"
   }
 }

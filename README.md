@@ -1,6 +1,6 @@
-# word-count README
+# jira-link README
 
-This is the README for your extension "word-count". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "jira-link". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

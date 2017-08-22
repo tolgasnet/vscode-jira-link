@@ -2,7 +2,6 @@ import { window, workspace, commands, Disposable, ExtensionContext, StatusBarAli
 var path = require('path');
 var getGitBranchName = require('git-branch-name');
 var opn = require('opn');
-var fs = require('fs');
 
 export function activate(ctx: ExtensionContext) {
 
@@ -38,7 +37,7 @@ export class JiraLink {
         }
 
         getGitBranchName(
-            path.resolve(__dirname, '../../'), 
+            path.resolve(__dirname, '../../'),
             (err, branchName) => {
                 this._jiraStory = this.getJiraStory(branchName);
                 if (this._jiraStory.Name.length === 0) {
