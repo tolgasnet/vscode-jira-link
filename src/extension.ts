@@ -16,6 +16,7 @@ export function activate(ctx: ExtensionContext) {
 export class JiraLink {
 
     private _jiraUriStorageKey: string = "jira-uri";
+    private _branchPatternStorageKey: string = "branch-pattern";
     private _statusBarItem: StatusBarItem;
     private _ctx: ExtensionContext;
     private _jiraStory: JiraStory;
@@ -48,6 +49,7 @@ export class JiraLink {
 
                 this._statusBarItem.command = "extension.jiraBrowseLinkCommand";
                 this._statusBarItem.text = `$(tag) JIRA`;
+                this._statusBarItem.tooltip = this._jiraStory.Url;
                 this._statusBarItem.show();
             });
     }
@@ -57,8 +59,7 @@ export class JiraLink {
     }
 
     private getJiraStory(branchName: string) : JiraStory {
-        var namePattern = /feature\/(.*)\/.*/g;
-        var match = namePattern.exec(branchName);
+        var match = this.getBranchPatternRegExp().exec(branchName);
         while(match === null) {
             return { Name: "", Url: "" };
         }
@@ -87,7 +88,7 @@ export class JiraLink {
                 prompt: "Enter your JIRA host base url"
             })
             .then((value) => {
-                if (!value) return;
+                if (typeof value == 'undefined') return;
 
                 this._ctx.workspaceState
                     .update(this._jiraUriStorageKey, value)
@@ -102,8 +103,41 @@ export class JiraLink {
             });
     }
 
+    public setBranchPattern() {
+        var branchPattern = this.getBranchPatternRegExp();
+
+        window
+            .showInputBox(
+            {
+                value: branchPattern.source,
+                prompt: "Enter your GIT branch pattern or set to empty to restore to default."
+            })
+            .then((value) => {
+                if (typeof value == 'undefined') return;
+
+                this._ctx.workspaceState
+                    .update(this._branchPatternStorageKey, value)
+                    .then(
+                        (isSuccessful) => {
+                            if (isSuccessful) {
+                                var updatedValue = value.length > 0 ? 
+                                    `GIT branch pattern is updated as ${value}` : 
+                                    "GIT branch pattern is restored to default.";
+                                window.showInformationMessage(`GIT branch pattern is updated as ${value}`);
+                                this.updateJiraLink();
+                            }
+                        }
+                    );
+            });
+    }
+
     private getJiraUri(): string {
         return this._ctx.workspaceState.get<string>(this._jiraUriStorageKey, "");
+    }
+
+    private getBranchPatternRegExp(): RegExp {
+        var branchPattern = this._ctx.workspaceState.get<string>(this._branchPatternStorageKey, "");
+        return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/(.*)\/.*/i;    
     }
 
     public dispose() {
@@ -132,7 +166,9 @@ class JiraLinkController {
 
         var setUrlCommand = commands.registerCommand('extension.setJiraBaseUrlCommand', this._onSetBaseUrl, this);
 
-        this._disposable = Disposable.from(...subscriptions, clickUrlCommand, setUrlCommand);
+        var setBranchPatternCommand = commands.registerCommand('extension.setBranchPatternCommand', this._onSetBranchPattern, this);
+
+        this._disposable = Disposable.from(...subscriptions, clickUrlCommand, setUrlCommand, setBranchPatternCommand);
     }
 
     private _onActiveEditorChangedEvent() {
@@ -145,6 +181,10 @@ class JiraLinkController {
 
     private _onSetBaseUrl() {
         this._jiraLink.setBaseUrl();
+    }
+
+    private _onSetBranchPattern() {
+        this._jiraLink.setBranchPattern();
     }
 
     public dispose() {

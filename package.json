@@ -19,6 +19,10 @@
       {
         "command": "extension.setJiraBaseUrlCommand",
         "title": "Set JIRA base url"
+      },
+      {
+        "command": "extension.setBranchPatternCommand",
+        "title": "Set GIT branch pattern for JIRA link"
       }
     ]
   },
