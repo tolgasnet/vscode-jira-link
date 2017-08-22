@@ -27,7 +27,6 @@ export class JiraLink {
     }
 
     public updateJiraLink() {
-        
         if (!this._statusBarItem) {
             this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         } 
@@ -43,12 +42,15 @@ export class JiraLink {
             (err, branchName) => {
                 this._jiraStory = this.getJiraStory(branchName);
                 if (this._jiraStory.Name.length === 0) {
-                    this._statusBarItem.hide();
+                    this._statusBarItem.command = null;
+                    this._statusBarItem.text = `$(issue-opened) JIRA`;
+                    this._statusBarItem.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${this.getBranchPatternRegExp().source}`;
+                    this._statusBarItem.show();
                     return;
                 }
 
                 this._statusBarItem.command = "extension.jiraBrowseLinkCommand";
-                this._statusBarItem.text = `$(tag) JIRA`;
+                this._statusBarItem.text = `$(link-external) JIRA`;
                 this._statusBarItem.tooltip = this._jiraStory.Url;
                 this._statusBarItem.show();
             });
