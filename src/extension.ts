@@ -15,11 +15,13 @@ export function activate(ctx: ExtensionContext) {
 
 export class JiraLink {
 
+    private _jiraUriStorageKey: string = "jira-uri";
     private _statusBarItem: StatusBarItem;
-    private _urlCommand: Disposable;
     private _ctx: ExtensionContext;
+    private _jiraStory: JiraStory;
 
     constructor(ctx: ExtensionContext) {
+        this._jiraStory = { Name: "", Url: "" };
         this._ctx = ctx;
     }
 
@@ -38,23 +40,23 @@ export class JiraLink {
         getGitBranchName(
             path.resolve(__dirname, '../../'), 
             (err, branchName) => {
-                var jiraStory = this.getJiraStory(branchName);
-                if (jiraStory.Name.length === 0) {
+                this._jiraStory = this.getJiraStory(branchName);
+                if (this._jiraStory.Name.length === 0) {
                     this._statusBarItem.hide();
                     return;
                 }
 
-                this._urlCommand = commands.registerCommand('extension.jiraLinkCommand', function () {
-                    opn(jiraStory.Url);
-                });
-
-                this._statusBarItem.command = "extension.jiraLinkCommand";
+                this._statusBarItem.command = "extension.jiraBrowseLinkCommand";
                 this._statusBarItem.text = `$(tag) JIRA`;
                 this._statusBarItem.show();
             });
     }
 
-    public getJiraStory(branchName: string) : JiraStory {
+    public openJiraLink() {
+        opn(this._jiraStory.Url);
+    }
+
+    private getJiraStory(branchName: string) : JiraStory {
         var namePattern = /feature\/(.*)\/.*/g;
         var match = namePattern.exec("feature/PROJ-123/test");
         while(match === null) {
@@ -62,35 +64,50 @@ export class JiraLink {
         }
         var storyNumber = match[1];
 
-        var jiraBaseUri = this._ctx.workspaceState.get<string>("jira-uri", "");
-        var self = this;
+        var jiraBaseUri = this.getJiraUri();
         if (jiraBaseUri.length === 0) {
-            window
-                .showInputBox({ value: "JIRA host ie. https://mydomain.attlassian.net" })
-                .then<string>((value) => { 
-                    jiraBaseUri = value; 
-                    this._ctx.workspaceState.update("jira-uri", jiraBaseUri);
-                    window.showInformationMessage(jiraBaseUri);
-                    return value;
-                });
+            this.setBaseUrl();
         }
 
-        var jiraUrl = `https://changeme.atlassian.net/browse/${storyNumber}`;
+        var jiraUrl = `${jiraBaseUri}/browse/${storyNumber}`;
 
         return { Name: storyNumber, Url: jiraUrl };
     }
 
-    public readJson(path: string, done) {
-        var configValues;
-        fs.readFile(path, 'utf8', function (err, data) {
-            configValues = err ? "none" : JSON.parse(data); 
-            done(configValues);
-        });
+    public setBaseUrl() {
+        var jiraBaseUri = this.getJiraUri();
+        var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
+        var domainFragmentEndIndex = defaultUri.indexOf(".");
+
+        window
+            .showInputBox(
+            {
+                value: defaultUri,
+                valueSelection: [8, domainFragmentEndIndex],
+                prompt: "Enter your JIRA host base url"
+            })
+            .then((value) => {
+                if (!value) return;
+
+                this._ctx.workspaceState
+                    .update(this._jiraUriStorageKey, value)
+                    .then(
+                        (isSuccessful) => {
+                            if (isSuccessful) {
+                                window.showInformationMessage(`JIRA base url is updated as ${value}`);
+                                this.updateJiraLink();
+                            }
+                        }
+                    );
+            });
+    }
+
+    private getJiraUri(): string {
+        return this._ctx.workspaceState.get<string>(this._jiraUriStorageKey, "");
     }
 
     public dispose() {
         this._statusBarItem.dispose();
-        this._urlCommand.dispose();
     }
 }
 
@@ -109,14 +126,25 @@ class JiraLinkController {
         this._jiraLink.updateJiraLink();
 
         let subscriptions: Disposable[] = [];
-        window.onDidChangeTextEditorSelection(this._onEvent, this, subscriptions);
-        window.onDidChangeActiveTextEditor(this._onEvent, this, subscriptions);
+        window.onDidChangeActiveTextEditor(this._onActiveEditorChangedEvent, this, subscriptions);
 
-        this._disposable = Disposable.from(...subscriptions);
+        var clickUrlCommand = commands.registerCommand('extension.jiraBrowseLinkCommand', this._onClickJiraLinkEvent, this);
+
+        var setUrlCommand = commands.registerCommand('extension.setJiraBaseUrlCommand', this._onSetBaseUrl, this);
+
+        this._disposable = Disposable.from(...subscriptions, clickUrlCommand, setUrlCommand);
     }
 
-    private _onEvent() {
+    private _onActiveEditorChangedEvent() {
         this._jiraLink.updateJiraLink();
+    }
+
+    private _onClickJiraLinkEvent() {
+        this._jiraLink.openJiraLink();
+    }
+
+    private _onSetBaseUrl() {
+        this._jiraLink.setBaseUrl();
     }
 
     public dispose() {
