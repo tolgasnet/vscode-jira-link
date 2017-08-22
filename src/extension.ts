@@ -58,7 +58,7 @@ export class JiraLink {
 
     private getJiraStory(branchName: string) : JiraStory {
         var namePattern = /feature\/(.*)\/.*/g;
-        var match = namePattern.exec("feature/PROJ-123/test");
+        var match = namePattern.exec(branchName);
         while(match === null) {
             return { Name: "", Url: "" };
         }
