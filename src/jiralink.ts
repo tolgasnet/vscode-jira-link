@@ -1,21 +1,27 @@
 import { StatusBarItem, ExtensionContext, StatusBarAlignment, window, workspace } from 'vscode';
 import { Git } from './git';
 import { BranchPattern } from './config/branch-pattern';
+import { JiraDomain } from './config/jira-domain';
 var opn = require('opn');
 
 export class JiraLink {
     
-        private _jiraUriStorageKey: string = "jira-uri";
         private _statusBarItem: StatusBarItem;
         private _ctx: ExtensionContext;
         private _jiraStory: JiraStory;
         private _git: Git;
         private _branchPattern: BranchPattern;
+        private _jiraDomain: JiraDomain;
     
-        constructor(ctx: ExtensionContext, branchPattern: BranchPattern) {
+        constructor(
+            ctx: ExtensionContext, 
+            branchPattern: BranchPattern, 
+            jiraDomain: JiraDomain) {
+
             this._jiraStory = { Name: "", Url: "" };
             this._ctx = ctx;
             this._branchPattern = branchPattern;
+            this._jiraDomain = jiraDomain;
             this._git = new Git();
         }
     
@@ -60,9 +66,9 @@ export class JiraLink {
                 return { Name: "", Url: "" };
             }
     
-            var jiraBaseUri = this.getJiraUri();
+            var jiraBaseUri = this._jiraDomain.get();
             if (jiraBaseUri.length === 0) {
-                this.setBaseUrl();
+                this._jiraDomain.set(() => this.updateJiraLink());
             }
     
             var jiraUrl = `${jiraBaseUri}/browse/${storyNumber}`;
@@ -70,38 +76,6 @@ export class JiraLink {
             return { Name: storyNumber, Url: jiraUrl };
         }
     
-        public setBaseUrl() {
-            var jiraBaseUri = this.getJiraUri();
-            var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
-            var domainFragmentEndIndex = defaultUri.indexOf(".");
-    
-            window
-                .showInputBox(
-                {
-                    value: defaultUri,
-                    valueSelection: [8, domainFragmentEndIndex],
-                    prompt: "Enter your JIRA host base url"
-                })
-                .then((value) => {
-                    if (typeof value == 'undefined') return;
-    
-                    this._ctx.workspaceState
-                        .update(this._jiraUriStorageKey, value)
-                        .then(
-                            (isSuccessful) => {
-                                if (isSuccessful) {
-                                    window.showInformationMessage(`JIRA base url is updated as ${value}`);
-                                    this.updateJiraLink();
-                                }
-                            }
-                        );
-                });
-        }
-    
-        private getJiraUri(): string {
-            return this._ctx.workspaceState.get<string>(this._jiraUriStorageKey, "");
-        }
-
         public dispose() {
             this._statusBarItem.dispose();
         }
