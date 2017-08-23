@@ -8,7 +8,7 @@ export class JiraLink {
     
         private _statusBarItem: StatusBarItem;
         private _ctx: ExtensionContext;
-        private _jiraStory: JiraStory;
+        private _jiraUrl: string = "";
         private _git: Git;
         private _branchPattern: BranchPattern;
         private _jiraDomain: JiraDomain;
@@ -18,7 +18,6 @@ export class JiraLink {
             branchPattern: BranchPattern, 
             jiraDomain: JiraDomain) {
 
-            this._jiraStory = { Name: "", Url: "" };
             this._ctx = ctx;
             this._branchPattern = branchPattern;
             this._jiraDomain = jiraDomain;
@@ -39,8 +38,8 @@ export class JiraLink {
             this._git.getCurrentBranch(
                 workspace.rootPath,
                 (branchName) => {
-                    this._jiraStory = this.getJiraStory(branchName);
-                    if (this._jiraStory.Name.length === 0) {
+                    this._jiraUrl = this.buildUrl(branchName);
+                    if (this._jiraUrl.length === 0) {
                         this._statusBarItem.command = null;
                         this._statusBarItem.text = `$(issue-opened) JIRA`;
                         this._statusBarItem.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${this._branchPattern.get().source}`;
@@ -50,38 +49,31 @@ export class JiraLink {
     
                     this._statusBarItem.command = "extension.jiraBrowseLinkCommand";
                     this._statusBarItem.text = `$(link-external) JIRA`;
-                    this._statusBarItem.tooltip = this._jiraStory.Url;
+                    this._statusBarItem.tooltip = this._jiraUrl;
                     this._statusBarItem.show();
                 });
         }
     
         public openWithBrowser() {
-            opn(this._jiraStory.Url);
+            opn(this._jiraUrl);
         }
     
-        private getJiraStory(branchName: string) : JiraStory {
+        private buildUrl(branchName: string) : string {
             let storyNumber = this._branchPattern.match(branchName);
 
             if (storyNumber.length === 0) {
-                return { Name: "", Url: "" };
+                return "";
             }
     
-            var jiraBaseUri = this._jiraDomain.get();
-            if (jiraBaseUri.length === 0) {
+            var jiraDomain = this._jiraDomain.get();
+            if (jiraDomain.length === 0) {
                 this._jiraDomain.showInputBox(() => this.updateJiraLink());
             }
     
-            var jiraUrl = `${jiraBaseUri}/browse/${storyNumber}`;
-    
-            return { Name: storyNumber, Url: jiraUrl };
+            return `${jiraDomain}/browse/${storyNumber}`;
         }
     
         public dispose() {
             this._statusBarItem.dispose();
         }
-    }
-    
-    class JiraStory {
-        public Url: string;
-        public Name: string;
     }
