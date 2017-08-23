@@ -9,7 +9,7 @@ export class JiraDomain {
         this._ctx = ctx;
     }
 
-    public set(callback: Function) {
+    public showInputBox(callback: Function) {
         var jiraBaseUri = this.get();
         var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
         var domainFragmentEndIndex = defaultUri.indexOf(".");

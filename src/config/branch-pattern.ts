@@ -22,13 +22,13 @@ export class BranchPattern {
         return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/([a-zA-Z]{3}\-?[0-9]{3})/i;    
     }
 
-    public set(callback: Function) {
-        var branchPattern = this.get();
+    public showInputBox(callback: Function) {
+        var currentBranchPattern = this.get();
 
         window
             .showInputBox(
             {
-                value: branchPattern.source,
+                value: currentBranchPattern.source,
                 prompt: "Enter your GIT branch pattern or set to empty to restore to default."
             })
             .then((value) => {

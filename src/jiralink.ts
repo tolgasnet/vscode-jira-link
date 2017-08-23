@@ -55,7 +55,7 @@ export class JiraLink {
                 });
         }
     
-        public openJiraLink() {
+        public openWithBrowser() {
             opn(this._jiraStory.Url);
         }
     
@@ -68,7 +68,7 @@ export class JiraLink {
     
             var jiraBaseUri = this._jiraDomain.get();
             if (jiraBaseUri.length === 0) {
-                this._jiraDomain.set(() => this.updateJiraLink());
+                this._jiraDomain.showInputBox(() => this.updateJiraLink());
             }
     
             var jiraUrl = `${jiraBaseUri}/browse/${storyNumber}`;
