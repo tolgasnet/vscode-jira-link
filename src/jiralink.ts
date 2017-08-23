@@ -3,6 +3,7 @@ import { Git } from './git';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 import { StatusBar } from './statusBar';
+import { UrlBuilder } from './urlBuilder';
 var opn = require('opn');
 
 export class JiraLink {
@@ -13,6 +14,7 @@ export class JiraLink {
         private _git: Git;
         private _branchPattern: BranchPattern;
         private _jiraDomain: JiraDomain;
+        private _urlBuilder: UrlBuilder;
     
         constructor(
             ctx: ExtensionContext, 
@@ -24,6 +26,11 @@ export class JiraLink {
             this._jiraDomain = jiraDomain;
             this._statusBar = new StatusBar();
             this._git = new Git();
+            this._urlBuilder = new UrlBuilder(branchPattern, jiraDomain);
+        }
+
+        public initialize() {
+            this._jiraDomain.initialize(() => this.update());
         }
     
         public update() {
@@ -42,27 +49,12 @@ export class JiraLink {
         }
 
         private updateStatusBar(branchName: string) {
-            this._jiraUrl = this.buildUrl(branchName);
+            this._jiraUrl = this._urlBuilder.build(branchName);
             if (this._jiraUrl.length === 0) {
                 this._statusBar.Error(branchName, this._branchPattern.get().source);
                 return;
             }
 
             this._statusBar.show(this._jiraUrl);
-        }
-    
-        private buildUrl(branchName: string) : string {
-            let storyNumber = this._branchPattern.match(branchName);
-
-            if (storyNumber.length === 0) {
-                return "";
-            }
-    
-            var jiraDomain = this._jiraDomain.get();
-            if (jiraDomain.length === 0) {
-                this._jiraDomain.showInputBox(() => this.update());
-            }
-    
-            return `${jiraDomain}/browse/${storyNumber}`;
         }
     }

@@ -9,6 +9,16 @@ export class JiraDomain {
         this._ctx = ctx;
     }
 
+    public initialize(update: Function) {
+        var jiraDomain = this.get();
+        if (jiraDomain.length === 0) {
+            this.showInputBox(() => update());
+            return;
+        }
+
+        update();
+    }
+
     public showInputBox(callback: Function) {
         var jiraBaseUri = this.get();
         var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
