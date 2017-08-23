@@ -1,14 +1,13 @@
 import { window, commands, Disposable } from 'vscode';
 import { JiraLink } from './jiralink';
 
-export class JiraLinkController {
+export class Events {
     
         private _jiraLink: JiraLink;
         private _subscriptions: Disposable[] = [];
     
         constructor(jiraLink: JiraLink) {
             this._jiraLink = jiraLink;
-            this._jiraLink.updateJiraLink();
     
             window.onDidChangeActiveTextEditor(this._jiraLink.updateJiraLink, this, this._subscriptions);
 

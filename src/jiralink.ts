@@ -1,6 +1,6 @@
 import { StatusBarItem, ExtensionContext, StatusBarAlignment, window, workspace } from 'vscode';
+import { Git } from './git';
 var opn = require('opn');
-var exec = require('child_process').exec;
 
 export class JiraLink {
     
@@ -9,10 +9,12 @@ export class JiraLink {
         private _statusBarItem: StatusBarItem;
         private _ctx: ExtensionContext;
         private _jiraStory: JiraStory;
+        private _git: Git;
     
         constructor(ctx: ExtensionContext) {
             this._jiraStory = { Name: "", Url: "" };
             this._ctx = ctx;
+            this._git = new Git();
         }
     
         public updateJiraLink() {
@@ -26,7 +28,7 @@ export class JiraLink {
                 return;
             }
     
-            this.getCurrentBranch(
+            this._git.getCurrentBranch(
                 workspace.rootPath,
                 (branchName) => {
                     this._jiraStory = this.getJiraStory(branchName);
@@ -48,13 +50,6 @@ export class JiraLink {
         public openJiraLink() {
             opn(this._jiraStory.Url);
         }
-    
-        private getCurrentBranch(directory: string, callback: (branchName) => void) {
-            const cmd = 'git rev-parse --abbrev-ref HEAD';
-            exec(cmd, { cwd: directory }, function (err, stdout, stderr) {
-                callback(stdout.split('\n').join(''))
-            })
-          }
     
         private getJiraStory(branchName: string) : JiraStory {
             var match = this.getBranchPatternRegExp().exec(branchName);

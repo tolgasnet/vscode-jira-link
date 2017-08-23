@@ -1,12 +1,14 @@
 import { ExtensionContext } from 'vscode';
 import { JiraLink } from './jiralink';
-import { JiraLinkController } from './jiralink-controller';
+import { Events } from './events';
 
 export function activate(ctx: ExtensionContext) {
 
     let jiraLink = new JiraLink(ctx);
-    let controller = new JiraLinkController(jiraLink);
+    jiraLink.updateJiraLink();
 
-    ctx.subscriptions.push(controller);
+    let events = new Events(jiraLink);
+
+    ctx.subscriptions.push(events);
     ctx.subscriptions.push(jiraLink);
 }
