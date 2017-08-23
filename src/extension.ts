@@ -1,7 +1,7 @@
 import { window, workspace, commands, Disposable, ExtensionContext, StatusBarAlignment, StatusBarItem, TextDocument, InputBoxOptions } from 'vscode';
 var path = require('path');
-var getGitBranchName = require('git-branch-name');
 var opn = require('opn');
+var exec = require('child_process').exec;
 
 export function activate(ctx: ExtensionContext) {
 
@@ -36,9 +36,9 @@ export class JiraLink {
             return;
         }
 
-        getGitBranchName(
-            path.resolve(__dirname, '../../'),
-            (err, branchName) => {
+        this.getCurrentBranch(
+            workspace.rootPath,
+            (branchName) => {
                 this._jiraStory = this.getJiraStory(branchName);
                 if (this._jiraStory.Name.length === 0) {
                     this._statusBarItem.command = null;
@@ -58,6 +58,13 @@ export class JiraLink {
     public openJiraLink() {
         opn(this._jiraStory.Url);
     }
+
+    private getCurrentBranch(directory: string, callback: (branchName) => void) {
+        const cmd = 'git rev-parse --abbrev-ref HEAD';
+        exec(cmd, { cwd: directory }, function (err, stdout, stderr) {
+            callback(stdout.split('\n').join(''))
+        })
+      }
 
     private getJiraStory(branchName: string) : JiraStory {
         var match = this.getBranchPatternRegExp().exec(branchName);
@@ -138,7 +145,7 @@ export class JiraLink {
 
     private getBranchPatternRegExp(): RegExp {
         var branchPattern = this._ctx.workspaceState.get<string>(this._branchPatternStorageKey, "");
-        return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/(.*)\/.*/i;    
+        return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/([a-zA-Z]{3}\-?[0-9]{3})/i;    
     }
 
     public dispose() {
