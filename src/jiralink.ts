@@ -29,20 +29,26 @@ export class JiraLink {
         public updateJiraLink() {
             this._git.getCurrentBranch(
                 workspace.rootPath,
-                (branchName) => {
-                    this._jiraUrl = this.buildUrl(branchName);
-                    if (this._jiraUrl.length === 0) {
-                        this._statusBar.Error(branchName, this._branchPattern.get().source);
-                        return;
-                    }
-
-                    this._statusBar.show(this._jiraUrl);
-                }
+                (branchName) => this.updateStatusBar(branchName)
             );
         }
     
         public openWithBrowser() {
             opn(this._jiraUrl);
+        }
+
+        public dispose() {
+            this._statusBar.dispose();
+        }
+
+        private updateStatusBar(branchName: string) {
+            this._jiraUrl = this.buildUrl(branchName);
+            if (this._jiraUrl.length === 0) {
+                this._statusBar.Error(branchName, this._branchPattern.get().source);
+                return;
+            }
+
+            this._statusBar.show(this._jiraUrl);
         }
     
         private buildUrl(branchName: string) : string {
@@ -58,9 +64,5 @@ export class JiraLink {
             }
     
             return `${jiraDomain}/browse/${storyNumber}`;
-        }
-    
-        public dispose() {
-            this._statusBar.dispose();
         }
     }
