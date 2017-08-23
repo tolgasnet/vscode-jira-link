@@ -26,14 +26,14 @@ export class JiraLink {
             this._git = new Git();
         }
     
-        public updateJiraLink() {
+        public update() {
             this._git.getCurrentBranch(
                 workspace.rootPath,
                 (branchName) => this.updateStatusBar(branchName)
             );
         }
     
-        public openWithBrowser() {
+        public browse() {
             opn(this._jiraUrl);
         }
 
@@ -60,7 +60,7 @@ export class JiraLink {
     
             var jiraDomain = this._jiraDomain.get();
             if (jiraDomain.length === 0) {
-                this._jiraDomain.showInputBox(() => this.updateJiraLink());
+                this._jiraDomain.showInputBox(() => this.update());
             }
     
             return `${jiraDomain}/browse/${storyNumber}`;

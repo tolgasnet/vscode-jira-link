@@ -10,7 +10,7 @@ export function activate(ctx: ExtensionContext) {
     let jiraDomain = new JiraDomain(ctx);
 
     let jiraLink = new JiraLink(ctx, branchPattern, jiraDomain);
-    jiraLink.updateJiraLink();
+    jiraLink.update();
 
     let events = new Events(jiraLink, branchPattern, jiraDomain);
 

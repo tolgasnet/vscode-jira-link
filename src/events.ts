@@ -15,16 +15,16 @@ export class Events {
             this._branchPattern = branchPattern;
             this._jiraDomain = jiraDomain;
     
-            window.onDidChangeActiveTextEditor(this._jiraLink.updateJiraLink, this, this._subscriptions);
+            window.onDidChangeActiveTextEditor(this._jiraLink.update, this, this._subscriptions);
 
             this.registerCommand('extension.jiraBrowseLinkCommand', 
-                () => this._jiraLink.openWithBrowser());
+                () => this._jiraLink.browse());
 
             this.registerCommand('extension.setJiraBaseUrlCommand', 
-                () => this._jiraDomain.showInputBox(() => this._jiraLink.updateJiraLink()));
+                () => this._jiraDomain.showInputBox(() => this._jiraLink.update()));
 
             this.registerCommand('extension.setBranchPatternCommand', 
-                () => this._branchPattern.showInputBox(() => this._jiraLink.updateJiraLink()));
+                () => this._branchPattern.showInputBox(() => this._jiraLink.update()));
         }
     
         public dispose() {
