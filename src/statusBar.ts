@@ -18,7 +18,7 @@ export class StatusBar {
         if (!this._statusBarItem) {
             this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         }
-        this._statusBarItem.command = "extension.jiraBrowseLinkCommand";
+        this._statusBarItem.command = "jira-link.browse";
         this._statusBarItem.text = `$(link-external) JIRA`;
         this._statusBarItem.tooltip = jiraUrl;
         this._statusBarItem.show();

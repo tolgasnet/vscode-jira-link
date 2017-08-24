@@ -6,17 +6,38 @@
 // The module 'assert' provides assertion methods from node
 import * as assert from 'assert';
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
 import * as vscode from 'vscode';
 import * as myExtension from '../src/extension';
+import * as sinon from 'sinon';
+import { UrlBuilder } from '../src/urlBuilder';
+import { BranchPattern } from '../src/config/branch-pattern';
+import { JiraDomain } from '../src/config/jira-domain';
 
-// Defines a Mocha test suite to group tests of similar kind together
-suite("Extension Tests", () => {
+suite("Extension", () => {
 
-    // Defines a Mocha unit test
-    test("Something 1", () => {
-        assert.equal(-1, [1, 2, 3].indexOf(5));
-        assert.equal(-1, [1, 2, 3].indexOf(0));
+    test("should be present", () => {
+        assert.ok(vscode.extensions.getExtension("tolgasofuoglu.jira-link"));
+    });
+
+    test("should be active", () => {
+        assert.ok(vscode.extensions.getExtension("tolgasofuoglu.jira-link").isActive);
+    });
+
+    test("should have the commands registered", () => {
+        return vscode.commands.getCommands(true).then((commands) => {
+            const expectedCommands = [
+                "jira-link.browse",
+                "jira-link.setJiraDomain",
+                "jira-link.setBranchPattern"
+            ];
+
+            const actualCommands = commands.filter((value) => {
+                return expectedCommands.indexOf(value) >= 0 || value.startsWith("jira-link.");
+            });
+
+            let listOfActualCommands = actualCommands.join(",");
+            const errorMsg = `Got: ${listOfActualCommands}`;
+            assert.equal(actualCommands.length, expectedCommands.length, errorMsg);
+        });
     });
 });

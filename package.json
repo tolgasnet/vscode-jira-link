@@ -3,7 +3,7 @@
   "displayName": "jira-link",
   "description": "",
   "version": "0.0.1",
-  "publisher": "tolgasnet",
+  "publisher": "tolgasofuoglu",
   "engines": {
     "vscode": "^1.15.0"
   },
@@ -17,11 +17,11 @@
   "contributes": {
     "commands": [
       {
-        "command": "extension.setJiraBaseUrlCommand",
+        "command": "jira-link.setJiraDomain",
         "title": "Set JIRA base url"
       },
       {
-        "command": "extension.setBranchPatternCommand",
+        "command": "jira-link.setBranchPattern",
         "title": "Set GIT branch pattern for JIRA link"
       }
     ]

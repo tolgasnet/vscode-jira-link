@@ -17,13 +17,13 @@ export class Events {
     
             window.onDidChangeActiveTextEditor(this._jiraLink.update, this, this._subscriptions);
 
-            this.registerCommand('extension.jiraBrowseLinkCommand', 
+            this.registerCommand('jira-link.browse', 
                 () => this._jiraLink.browse());
 
-            this.registerCommand('extension.setJiraBaseUrlCommand', 
+            this.registerCommand('jira-link.setJiraDomain', 
                 () => this._jiraDomain.showInputBox(() => this._jiraLink.update()));
 
-            this.registerCommand('extension.setBranchPatternCommand', 
+            this.registerCommand('jira-link.setBranchPattern', 
                 () => this._branchPattern.showInputBox(() => this._jiraLink.update()));
         }
     
