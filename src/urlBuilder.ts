@@ -1,12 +1,9 @@
-import { BranchPattern } from './config/branch-pattern';
-import { JiraDomain } from './config/jira-domain';
-
 export class UrlBuilder {
 
-    private _branchPattern: BranchPattern;
-    private _jiraDomain: JiraDomain;
+    private _branchPattern;
+    private _jiraDomain;
 
-    constructor(branchPattern: BranchPattern, jiraDomain: JiraDomain) {
+    constructor(branchPattern, jiraDomain) {
         this._branchPattern = branchPattern;
         this._jiraDomain = jiraDomain;
     }
