@@ -1,5 +1,5 @@
 import { ExtensionContext } from 'vscode';
-import { JiraLink } from './jiralink';
+import { JiraLink } from './jira-link';
 import { Events } from './events';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';

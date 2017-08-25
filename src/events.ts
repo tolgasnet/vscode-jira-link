@@ -1,5 +1,5 @@
 import { window, commands, Disposable } from 'vscode';
-import { JiraLink } from './jiralink';
+import { JiraLink } from './jira-link';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 

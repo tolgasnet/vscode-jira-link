@@ -2,8 +2,8 @@ import { ExtensionContext, StatusBarAlignment, window, workspace } from 'vscode'
 import { Git } from './git';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
-import { StatusBar } from './statusBar';
-import { UrlBuilder } from './urlBuilder';
+import { StatusBar } from './status-bar';
+import { UrlBuilder } from './url-builder';
 var opn = require('opn');
 
 export class JiraLink {
