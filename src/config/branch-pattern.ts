@@ -9,7 +9,7 @@ export class BranchPattern {
         this._ctx = ctx;
     }
 
-    public match(branchName: string): string {
+    public extractStoryNumber(branchName: string): string {
         var match = this.get().exec(branchName);
         while(match === null) {
             return "";

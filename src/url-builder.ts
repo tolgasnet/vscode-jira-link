@@ -9,7 +9,7 @@ export class UrlBuilder {
     }
 
     public build(branchName: string) : string {
-        let storyNumber = this._branchPattern.match(branchName);
+        let storyNumber = this._branchPattern.extractStoryNumber(branchName);
 
         if (storyNumber.length === 0) {
             return "";

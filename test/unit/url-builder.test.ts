@@ -2,26 +2,30 @@ import * as TypeMoq from "typemoq";
 import { expect } from 'chai';
 import { UrlBuilder } from '../../src/url-builder';
 import { BranchPattern } from '../../src/config/branch-pattern';
+import { JiraDomain } from '../../src/config/jira-domain';
 
 describe("Url builder tests", () => {
 
+    const anyBranchName: string = "any-branch-name";
+    const mockBranchPattern: TypeMoq.IMock<BranchPattern> = TypeMoq.Mock.ofType<BranchPattern>();
+    const jiraDomain: TypeMoq.IMock<JiraDomain> = TypeMoq.Mock.ofType<JiraDomain>();
+    const urlBuilder = new UrlBuilder(mockBranchPattern.object, jiraDomain.object);
+
     it("given story number is empty string, returns empty url", () => {
+
+        mockBranchPattern.setup(x => x.extractStoryNumber(anyBranchName)).returns(() => "");
         
-        const mockBranchPattern: TypeMoq.IMock<BranchPattern> = TypeMoq.Mock.ofType<BranchPattern>();
-        mockBranchPattern.setup(x => x.match(TypeMoq.It.isAny())).returns(() => "");
-        let urlBuilder = new UrlBuilder(mockBranchPattern.object, null);
-        let url = urlBuilder.build("");
+        let url = urlBuilder.build(anyBranchName);
 
         expect(url).to.equal("");
     });
 
     it("builds url", () => {
         
-        let branchPattern = { match: () => { return "123"; } };
-        let jiraDomain = { get: () => { return "domain"; } };
+        mockBranchPattern.setup(x => x.extractStoryNumber(anyBranchName)).returns(() => "123");
+        jiraDomain.setup(x => x.get()).returns(() => "domain");
 
-        let urlBuilder = new UrlBuilder(<any>branchPattern, <any>jiraDomain);
-        let url = urlBuilder.build("");
+        let url = urlBuilder.build(anyBranchName);
 
         expect(url).to.equal("domain/browse/123");
     });
