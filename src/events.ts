@@ -17,10 +17,10 @@ export class Events {
     
             window.onDidChangeActiveTextEditor(this._jiraLink.update, this, this._subscriptions);
 
-            this.registerCommand('jira-link.browse', 
+            this.registerCommand('jira-link.browse',
                 () => this._jiraLink.browse());
 
-            this.registerCommand('jira-link.setJiraDomain', 
+            this.registerCommand('jira-link.setJiraDomain',
                 () => this._jiraDomain.showInputBox(() => this._jiraLink.update()));
 
             this.registerCommand('jira-link.setBranchPattern', 

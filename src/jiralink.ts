@@ -17,7 +17,7 @@ export class JiraLink {
         private _urlBuilder: UrlBuilder;
     
         constructor(
-            ctx: ExtensionContext, 
+            ctx: ExtensionContext,
             branchPattern: BranchPattern, 
             jiraDomain: JiraDomain) {
 
@@ -51,7 +51,7 @@ export class JiraLink {
         private updateStatusBar(branchName: string) {
             this._jiraUrl = this._urlBuilder.build(branchName);
             if (this._jiraUrl.length === 0) {
-                this._statusBar.Error(branchName, this._branchPattern.get().source);
+                this._statusBar.error(branchName, this._branchPattern.get().source);
                 return;
             }
 

@@ -4,7 +4,7 @@ export class StatusBar {
 
     private _statusBarItem: StatusBarItem;
 
-    public Error(branchName: string, storyNumber: string) {
+    public error(branchName: string, storyNumber: string) {
         if (!this._statusBarItem) {
             this._statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
         }
