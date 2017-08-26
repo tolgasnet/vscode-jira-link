@@ -9,7 +9,7 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as myExtension from '../src/extension';
 import * as sinon from 'sinon';
-import { UrlBuilder } from '../src/url-builder';
+import urlBuilder from '../src/url-builder';
 import { BranchPattern } from '../src/config/branch-pattern';
 import { JiraDomain } from '../src/config/jira-domain';
 

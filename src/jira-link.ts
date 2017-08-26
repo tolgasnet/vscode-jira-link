@@ -3,7 +3,7 @@ import { Git } from './git';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 import { StatusBar } from './status-bar';
-import { UrlBuilder } from './url-builder';
+import urlBuilder from './url-builder';
 var opn = require('opn');
 
 export class JiraLink {
@@ -13,7 +13,6 @@ export class JiraLink {
         private _git: Git;
         private _branchPattern: BranchPattern;
         private _jiraDomain: JiraDomain;
-        private _urlBuilder: UrlBuilder;
     
         constructor(
             branchPattern: BranchPattern, 
@@ -23,7 +22,6 @@ export class JiraLink {
             this._jiraDomain = jiraDomain;
             this._statusBar = new StatusBar();
             this._git = new Git();
-            this._urlBuilder = new UrlBuilder(branchPattern, jiraDomain);
         }
 
         public initialize() {
@@ -46,7 +44,10 @@ export class JiraLink {
         }
 
         private updateStatusBar(branchName: string) {
-            this._jiraUrl = this._urlBuilder.build(branchName);
+            this._jiraUrl = urlBuilder(
+                () => this._branchPattern.extractStoryNumber(branchName), 
+                () => this._jiraDomain.get());
+            
             if (this._jiraUrl.length === 0) {
                 this._statusBar.error(branchName, this._branchPattern.get().source);
                 return;

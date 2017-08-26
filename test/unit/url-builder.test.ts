@@ -1,28 +1,23 @@
 import { expect } from 'chai';
-import { UrlBuilder } from '../../src/url-builder';
-import { BranchPattern } from '../../src/config/branch-pattern';
-import { JiraDomain } from '../../src/config/jira-domain';
+import urlBuilder from '../../src/url-builder';
 
 describe("Url builder tests", () => {
 
-    const anyBranchName: string = "any-branch-name";
-
     it("given story number is empty string, returns empty url", () => {
 
-        let branchPattern = { extractStoryNumber: () => { return ""; }};
-        let urlBuilder = new UrlBuilder(<any>branchPattern, null);
-        let url = urlBuilder.build(anyBranchName);
+        const getStoryNumber = () => "";
+        
+        const url = urlBuilder(() => getStoryNumber(), null);
 
         expect(url).to.equal("");
     });
 
-    it("builds url", () => {
+    it("given a story number and jira domain, builds url", () => {
         
-        let branchPattern = { extractStoryNumber: () => { return "123"; }};
-        let jiraDomain = { get: () => { return "domain"; }};
-
-        let urlBuilder = new UrlBuilder(<any>branchPattern, <any>jiraDomain);
-        let url = urlBuilder.build(anyBranchName);
+        const getStoryNumber = () => "123";
+        const getJiraDomain = () => "domain";
+        
+        const url = urlBuilder(() => getStoryNumber(), () => getJiraDomain());
 
         expect(url).to.equal("domain/browse/123");
     });

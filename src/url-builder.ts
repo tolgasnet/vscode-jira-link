@@ -1,25 +1,10 @@
-import { BranchPattern } from '../src/config/branch-pattern';
-import { JiraDomain } from '../src/config/jira-domain';
+export default function urlBuilder(getStoryNumber, getJiraDomain) {
 
-export class UrlBuilder {
-
-    private _branchPattern: BranchPattern;
-    private _jiraDomain: JiraDomain;
-
-    constructor(branchPattern: BranchPattern, jiraDomain: JiraDomain) {
-        this._branchPattern = branchPattern;
-        this._jiraDomain = jiraDomain;
+    const storyNumber = getStoryNumber();
+    
+    if (storyNumber.length === 0) {
+        return "";
     }
 
-    public build(branchName: string) : string {
-        const storyNumber = this._branchPattern.extractStoryNumber(branchName);
-
-        if (storyNumber.length === 0) {
-            return "";
-        }
-
-        const jiraDomain = this._jiraDomain.get();
-        
-        return `${jiraDomain}/browse/${storyNumber}`;
-    }
+    return `${getJiraDomain()}/browse/${storyNumber}`;
 }
