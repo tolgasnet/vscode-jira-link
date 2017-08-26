@@ -5,7 +5,7 @@ let statusBarItem: StatusBarItem;
 
 export const initialize = () => {
     statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-    //stateManager.subscriptions.push(statusBarItem);
+    stateManager.subscriptions.push(statusBarItem);
 };
 
 export function show(jiraUrl: string) {

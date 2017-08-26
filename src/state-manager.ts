@@ -8,7 +8,6 @@ export let subscriptions: { dispose(): any }[] = [];
 
 export function initialize(context: ExtensionContext) {
     state = context.workspaceState;
-    subscriptions = context.subscriptions;
 }
 
 export function getJiraDomain(): string {

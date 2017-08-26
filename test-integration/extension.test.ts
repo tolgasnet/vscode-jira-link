@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
-//import * as assert from 'assert';
 import { expect } from 'chai';
-import * as myExtension from '../src/extension';
+import * as stateManager from '../src/state-manager';
 
 suite("Extension", () => {
 
@@ -33,5 +32,9 @@ suite("Extension", () => {
             const errorMsg = `Got: ${listOfActualCommands}`;
             expect(actualCommands.length, errorMsg).to.equal(expectedCommands.length);
         });
+    });
+
+    test("should have the disposables subscribed", () => {
+        expect(stateManager.subscriptions).to.have.lengthOf(5);
     });
 });
