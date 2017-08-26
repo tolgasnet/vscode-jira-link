@@ -3,7 +3,10 @@ import { JiraLink } from './jira-link';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 
-export default function registerCommands(jiraLink, branchPattern, jiraDomain) {
+export default function registerCommands(
+    jiraLink: JiraLink, 
+    branchPattern: BranchPattern, 
+    jiraDomain: JiraDomain) {
     
     const updateEvent = window.onDidChangeActiveTextEditor(jiraLink.update);
 
