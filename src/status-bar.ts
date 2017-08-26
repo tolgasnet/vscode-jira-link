@@ -1,23 +1,23 @@
 import { StatusBarItem, StatusBarAlignment, window } from 'vscode';
+import * as stateManager from './state-manager';
 
-export function show(jiraUrl: string, subscriptions) {
-    let item = create();
-    item.command = "jira-link.browse";
-    item.text = `$(link-external) JIRA`;
-    item.tooltip = jiraUrl;
-    item.show();
-    subscriptions.push(item);
-}
+let statusBarItem: StatusBarItem;
 
-export function error(branchName: string, storyNumber: string, subscriptions) {
-    let item = create();
-    item.command = "jira-link.browse";
-    item.text = `$(issue-opened) JIRA`;
-    item.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${storyNumber}`;
-    item.show();
-    subscriptions.push(item);
-}
-
-const create = () => {
-    return window.createStatusBarItem(StatusBarAlignment.Left);
+export const initialize = () => {
+    statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
+    //stateManager.subscriptions.push(statusBarItem);
 };
+
+export function show(jiraUrl: string) {
+    statusBarItem.command = "jira-link.browse";
+    statusBarItem.text = `$(link-external) JIRA`;
+    statusBarItem.tooltip = jiraUrl;
+    statusBarItem.show();
+}
+
+export function error(branchName: string, storyNumber: string) {
+    statusBarItem.command = "jira-link.browse";
+    statusBarItem.text = `$(issue-opened) JIRA`;
+    statusBarItem.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${storyNumber}`;
+    statusBarItem.show();
+}

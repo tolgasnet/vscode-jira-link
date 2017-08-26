@@ -29,11 +29,11 @@ const updateStatusBar = (context, branchName) => {
     
     if (url.length === 0) {
         const storyNumber = branchPattern.get().source;
-        statusBar.error(branchName, storyNumber, context.subscriptions);
+        statusBar.error(branchName, storyNumber);
         browse = () => opn(jiraDomainUrl());
         return;
     }
 
     browse = () => opn(url);
-    statusBar.show(url, context.subscriptions);
+    statusBar.show(url);
 };

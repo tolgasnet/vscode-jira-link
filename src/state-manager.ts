@@ -1,9 +1,10 @@
-import { ExtensionContext, Memento } from 'vscode';
+import { ExtensionContext, Memento, Disposable } from 'vscode';
 
 let state: Memento;
-let subscriptions;
 const _jiraUriStorageKey: string = "jira-uri";
 const _branchPatternStorageKey: string = "branch-pattern";
+
+export let subscriptions: { dispose(): any }[] = [];
 
 export function initialize(context: ExtensionContext) {
     state = context.workspaceState;

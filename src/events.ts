@@ -2,32 +2,28 @@ import { window, commands, Disposable, ExtensionContext } from 'vscode';
 import * as jiraLink from './jira-link';
 import * as branchPattern from './config/branch-pattern';
 import * as jiraDomain from './config/jira-domain';
+import * as stateManager from './state-manager';
 
-export default function registerCommands(context: ExtensionContext) {
+export function register(context: ExtensionContext) {
 
     const update = () => jiraLink.update(context);
-    const updateEvent = window.onDidChangeActiveTextEditor(update);
+    const updateEvent = window.onDidChangeActiveTextEditor(update, null, stateManager.subscriptions);
 
-    const browseCmd = register('jira-link.browse',
+    const browseCmd = registerCommand('jira-link.browse',
         () => jiraLink.browse());
 
-    const jiraDomainCmd = register('jira-link.setJiraDomain',
+    const jiraDomainCmd = registerCommand('jira-link.setJiraDomain',
         () => jiraDomain.showInputBox(update));
 
-    const branchPatternCmd = register('jira-link.setBranchPattern', 
+    const branchPatternCmd = registerCommand('jira-link.setBranchPattern', 
         () => branchPattern.showInputBox(update));
-
-    return Disposable.from(
-        updateEvent,
-        browseCmd,
-        jiraDomainCmd,
-        branchPatternCmd);
 }
 
 const update = (context) => {
     jiraLink.update(context);
 };
 
-const register = (command, callback) => {
-    return commands.registerCommand(command, callback);
+const registerCommand = (command, callback) => {
+    let disposible = commands.registerCommand(command, callback);
+    stateManager.subscriptions.push(disposible);
 };
