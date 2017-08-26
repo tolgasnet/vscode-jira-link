@@ -11,7 +11,7 @@ export function show(jiraUrl: string, subscriptions) {
 
 export function error(branchName: string, storyNumber: string, subscriptions) {
     let item = create();
-    item.command = null;
+    item.command = "jira-link.browse";
     item.text = `$(issue-opened) JIRA`;
     item.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${storyNumber}`;
     item.show();

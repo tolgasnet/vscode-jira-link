@@ -20,13 +20,17 @@ export function update(context) {
 export let browse;
 
 const updateStatusBar = (context, branchName) => {
+
+    const jiraDomainUrl = () => jiraDomain.get(context.workspaceState);
+
     let url = urlBuilder(
         () => branchPattern.extractStoryNumber(context.workspaceState, branchName), 
-        () => jiraDomain.get(context.workspaceState));
+        () => jiraDomainUrl());
     
     if (url.length === 0) {
         const storyNumber = branchPattern.get(context.workspaceState).source;
         statusBar.error(branchName, storyNumber, context.subscriptions);
+        browse = () => opn(jiraDomainUrl());
         return;
     }
 
