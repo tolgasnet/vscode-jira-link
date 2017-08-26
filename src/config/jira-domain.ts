@@ -1,12 +1,12 @@
-import { ExtensionContext, window } from 'vscode';
+import { Memento, window } from 'vscode';
 
 export class JiraDomain {
 
     private _jiraUriStorageKey: string = "jira-uri";
-    private _ctx: ExtensionContext;
+    private _state: Memento;
 
-    constructor(ctx: ExtensionContext) {
-        this._ctx = ctx;
+    constructor(state: Memento) {
+        this._state = state;
     }
 
     public initialize(update: Function) {
@@ -34,7 +34,7 @@ export class JiraDomain {
             .then((value) => {
                 if (typeof value == 'undefined') return;
 
-                this._ctx.workspaceState
+                this._state
                     .update(this._jiraUriStorageKey, value)
                     .then(
                         (isSuccessful) => {
@@ -48,6 +48,6 @@ export class JiraDomain {
     }
 
     public get(): string {
-        return this._ctx.workspaceState.get<string>(this._jiraUriStorageKey, "");
+        return this._state.get<string>(this._jiraUriStorageKey, "");
     }
 }

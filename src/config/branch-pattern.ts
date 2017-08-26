@@ -1,12 +1,12 @@
-import { ExtensionContext, window } from 'vscode';
+import { Memento, window } from 'vscode';
 
 export class BranchPattern {
 
     private _branchPatternStorageKey: string = "branch-pattern";
-    private _ctx: ExtensionContext;
+    private _state: Memento;
 
-    constructor(ctx: ExtensionContext) {
-        this._ctx = ctx;
+    constructor(state: Memento) {
+        this._state = state;
     }
 
     public extractStoryNumber(branchName: string): string {
@@ -18,7 +18,7 @@ export class BranchPattern {
     }
 
     public get(): RegExp {
-        var branchPattern = this._ctx.workspaceState.get<string>(this._branchPatternStorageKey, "");
+        var branchPattern = this._state.get<string>(this._branchPatternStorageKey, "");
         return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/([a-zA-Z]{3}\-?[0-9]{3})/i;    
     }
 
@@ -34,7 +34,7 @@ export class BranchPattern {
             .then((value) => {
                 if (typeof value == 'undefined') return;
 
-                this._ctx.workspaceState
+                this._state
                     .update(this._branchPatternStorageKey, value)
                     .then(
                         (isSuccessful) => {

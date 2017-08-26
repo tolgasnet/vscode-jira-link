@@ -9,7 +9,6 @@ var opn = require('opn');
 export class JiraLink {
     
         private _statusBar: StatusBar;
-        private _ctx: ExtensionContext;
         private _jiraUrl: string = "";
         private _git: Git;
         private _branchPattern: BranchPattern;
@@ -17,11 +16,9 @@ export class JiraLink {
         private _urlBuilder: UrlBuilder;
     
         constructor(
-            ctx: ExtensionContext,
             branchPattern: BranchPattern, 
             jiraDomain: JiraDomain) {
 
-            this._ctx = ctx;
             this._branchPattern = branchPattern;
             this._jiraDomain = jiraDomain;
             this._statusBar = new StatusBar();

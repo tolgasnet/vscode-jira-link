@@ -4,16 +4,17 @@ import registerEvents from './events';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 
-export function activate(ctx: ExtensionContext) {
+export function activate(context: ExtensionContext) {
 
-    let branchPattern = new BranchPattern(ctx);
-    let jiraDomain = new JiraDomain(ctx);
+    let state = context.workspaceState;
+    let branchPattern = new BranchPattern(state);
+    let jiraDomain = new JiraDomain(state);
 
-    let jiraLink = new JiraLink(ctx, branchPattern, jiraDomain);
+    let jiraLink = new JiraLink(branchPattern, jiraDomain);
     jiraLink.initialize();
 
     var registeredEvents = registerEvents(jiraLink, branchPattern, jiraDomain);
 
-    ctx.subscriptions.push(registeredEvents);
-    ctx.subscriptions.push(jiraLink);
+    context.subscriptions.push(registeredEvents);
+    context.subscriptions.push(jiraLink);
 }
