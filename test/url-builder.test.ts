@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import urlBuilder from '../../src/url-builder';
+import urlBuilder from '../src/url-builder';
 
 describe("Url builder tests", () => {
 

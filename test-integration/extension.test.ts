@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import * as assert from 'assert';
+//import * as assert from 'assert';
+import { expect } from 'chai';
 import * as myExtension from '../src/extension';
 
 suite("Extension", () => {
@@ -7,11 +8,13 @@ suite("Extension", () => {
     const extensionId = "tolgasofuoglu.jira-link";
 
     test("should be present", () => {
-        assert.ok(vscode.extensions.getExtension(extensionId));
+        let extension = vscode.extensions.getExtension(extensionId);
+        expect(extension).to.not.be.undefined;
     });
 
     test("should be active", () => {
-        assert.ok(vscode.extensions.getExtension(extensionId).isActive);
+        let extension = vscode.extensions.getExtension(extensionId);
+        expect(extension.isActive).to.be.true;
     });
 
     test("should have the commands registered", () => {
@@ -28,7 +31,7 @@ suite("Extension", () => {
 
             let listOfActualCommands = actualCommands.join(",");
             const errorMsg = `Got: ${listOfActualCommands}`;
-            assert.equal(actualCommands.length, expectedCommands.length, errorMsg);
+            expect(actualCommands.length, errorMsg).to.equal(expectedCommands.length);
         });
     });
 });
