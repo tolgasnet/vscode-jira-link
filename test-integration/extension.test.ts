@@ -37,4 +37,12 @@ suite("Extension", () => {
     test("should have the disposables subscribed", () => {
         expect(stateManager.subscriptions).to.have.lengthOf(5);
     });
+
+    test("should have the default jira domain set to empty string", () => {
+        expect(stateManager.getJiraDomain()).to.equal("");
+    });
+
+    test("should have the default branch pattern set to empty string", () => {
+        expect(stateManager.getBranchPattern().source).to.equal("feature\\/([a-zA-Z]{1,4}\\-?[0-9]{1,4})");
+    });
 });
