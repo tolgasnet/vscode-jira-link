@@ -1,23 +1,21 @@
-import { window, commands, Disposable } from 'vscode';
-import { JiraLink } from './jira-link';
-import { BranchPattern } from './config/branch-pattern';
-import { JiraDomain } from './config/jira-domain';
+import { window, commands, Disposable, ExtensionContext } from 'vscode';
+import * as jiraLink from './jira-link';
+import * as branchPattern from './config/branch-pattern';
+import * as jiraDomain from './config/jira-domain';
 
-export default function registerCommands(
-    jiraLink: JiraLink, 
-    branchPattern: BranchPattern, 
-    jiraDomain: JiraDomain) {
-    
-    const updateEvent = window.onDidChangeActiveTextEditor(jiraLink.update);
+export default function registerCommands(context: ExtensionContext) {
+
+    const update = () => jiraLink.update(context);
+    const updateEvent = window.onDidChangeActiveTextEditor(update);
 
     const browseCmd = register('jira-link.browse',
         () => jiraLink.browse());
 
     const jiraDomainCmd = register('jira-link.setJiraDomain',
-        () => jiraDomain.showInputBox(() => jiraLink.update()));
+        () => jiraDomain.showInputBox(context.workspaceState, update));
 
     const branchPatternCmd = register('jira-link.setBranchPattern', 
-        () => branchPattern.showInputBox(() => jiraLink.update()));
+        () => branchPattern.showInputBox(context.workspaceState, update));
 
     return Disposable.from(
         updateEvent,
@@ -25,6 +23,10 @@ export default function registerCommands(
         jiraDomainCmd,
         branchPatternCmd);
 }
+
+const update = (context) => {
+    jiraLink.update(context);
+};
 
 const register = (command, callback) => {
     return commands.registerCommand(command, callback);

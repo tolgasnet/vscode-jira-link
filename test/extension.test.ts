@@ -4,23 +4,20 @@
 //
 
 // The module 'assert' provides assertion methods from node
-import * as assert from 'assert';
-
 import * as vscode from 'vscode';
+import * as assert from 'assert';
 import * as myExtension from '../src/extension';
-import * as sinon from 'sinon';
-import urlBuilder from '../src/url-builder';
-import { BranchPattern } from '../src/config/branch-pattern';
-import { JiraDomain } from '../src/config/jira-domain';
 
 suite("Extension", () => {
 
+    const extensionId = "tolgasofuoglu.jira-link";
+
     test("should be present", () => {
-        assert.ok(vscode.extensions.getExtension("tolgasofuoglu.jira-link"));
+        assert.ok(vscode.extensions.getExtension(extensionId));
     });
 
     test("should be active", () => {
-        assert.ok(vscode.extensions.getExtension("tolgasofuoglu.jira-link").isActive);
+        assert.ok(vscode.extensions.getExtension(extensionId).isActive);
     });
 
     test("should have the commands registered", () => {

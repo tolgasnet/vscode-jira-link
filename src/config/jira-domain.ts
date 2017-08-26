@@ -1,26 +1,19 @@
 import { Memento, window } from 'vscode';
 
-export class JiraDomain {
+    const _jiraUriStorageKey: string = "jira-uri";
 
-    private _jiraUriStorageKey: string = "jira-uri";
-    private _state: Memento;
-
-    constructor(state: Memento) {
-        this._state = state;
-    }
-
-    public initialize(update: Function) {
-        var jiraDomain = this.get();
+    export function initialize(state: Memento, update: Function) {
+        var jiraDomain = get(state);
         if (jiraDomain.length === 0) {
-            this.showInputBox(() => update());
+            showInputBox(state, () => update());
             return;
         }
 
         update();
     }
 
-    public showInputBox(callback: Function) {
-        var jiraBaseUri = this.get();
+    export function showInputBox(state: Memento, callback: Function) {
+        var jiraBaseUri = get(state);
         var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
         var domainFragmentEndIndex = defaultUri.indexOf(".");
 
@@ -34,8 +27,8 @@ export class JiraDomain {
             .then((value) => {
                 if (typeof value == 'undefined') return;
 
-                this._state
-                    .update(this._jiraUriStorageKey, value)
+                state
+                    .update(_jiraUriStorageKey, value)
                     .then(
                         (isSuccessful) => {
                             if (isSuccessful) {
@@ -47,7 +40,6 @@ export class JiraDomain {
             });
     }
 
-    public get(): string {
-        return this._state.get<string>(this._jiraUriStorageKey, "");
+    export function get(state: Memento): string {
+        return state.get<string>(_jiraUriStorageKey, "");
     }
-}

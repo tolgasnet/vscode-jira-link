@@ -1,58 +1,35 @@
-import { ExtensionContext, StatusBarAlignment, window, workspace } from 'vscode';
-import { Git } from './git';
-import { BranchPattern } from './config/branch-pattern';
-import { JiraDomain } from './config/jira-domain';
-import { StatusBar } from './status-bar';
+import { ExtensionContext, Memento, StatusBarAlignment, window, workspace } from 'vscode';
+import getCurrentBranch from './git';
+import * as branchPattern from './config/branch-pattern';
+import * as jiraDomain from './config/jira-domain';
+import * as statusBar from './status-bar';
 import urlBuilder from './url-builder';
 var opn = require('opn');
 
-export class JiraLink {
+export function initialize(context: ExtensionContext) {
+    jiraDomain.initialize(context.workspaceState, () => update(context));
+}
+
+export function update(context) {
+    getCurrentBranch(
+        workspace.rootPath,
+        (branchName) => updateStatusBar(context, branchName)
+    );
+}
+
+export let browse;
+
+const updateStatusBar = (context, branchName) => {
+    let url = urlBuilder(
+        () => branchPattern.extractStoryNumber(context.workspaceState, branchName), 
+        () => jiraDomain.get(context.workspaceState));
     
-        private _statusBar: StatusBar;
-        private _jiraUrl: string = "";
-        private _git: Git;
-        private _branchPattern: BranchPattern;
-        private _jiraDomain: JiraDomain;
-    
-        constructor(
-            branchPattern: BranchPattern, 
-            jiraDomain: JiraDomain) {
-
-            this._branchPattern = branchPattern;
-            this._jiraDomain = jiraDomain;
-            this._statusBar = new StatusBar();
-            this._git = new Git();
-        }
-
-        public initialize() {
-            this._jiraDomain.initialize(() => this.update());
-        }
-    
-        public update() {
-            this._git.getCurrentBranch(
-                workspace.rootPath,
-                (branchName) => this.updateStatusBar(branchName)
-            );
-        }
-    
-        public browse() {
-            opn(this._jiraUrl);
-        }
-
-        public dispose() {
-            this._statusBar.dispose();
-        }
-
-        private updateStatusBar(branchName: string) {
-            this._jiraUrl = urlBuilder(
-                () => this._branchPattern.extractStoryNumber(branchName), 
-                () => this._jiraDomain.get());
-            
-            if (this._jiraUrl.length === 0) {
-                this._statusBar.error(branchName, this._branchPattern.get().source);
-                return;
-            }
-
-            this._statusBar.show(this._jiraUrl);
-        }
+    if (url.length === 0) {
+        const storyNumber = branchPattern.get(context.workspaceState).source;
+        statusBar.error(branchName, storyNumber, context.subscriptions);
+        return;
     }
+
+    browse = () => opn(url);
+    statusBar.show(url, context.subscriptions);
+};

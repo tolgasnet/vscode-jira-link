@@ -1,20 +1,14 @@
 import { ExtensionContext } from 'vscode';
-import { JiraLink } from './jira-link';
 import registerEvents from './events';
-import { BranchPattern } from './config/branch-pattern';
-import { JiraDomain } from './config/jira-domain';
+import * as jiraLink from './jira-link';
+import * as branchPattern from './config/branch-pattern';
+import * as jiraDomain from './config/jira-domain';
 
 export function activate(context: ExtensionContext) {
 
-    let state = context.workspaceState;
-    let branchPattern = new BranchPattern(state);
-    let jiraDomain = new JiraDomain(state);
+    jiraLink.initialize(context);
 
-    let jiraLink = new JiraLink(branchPattern, jiraDomain);
-    jiraLink.initialize();
-
-    var registeredEvents = registerEvents(jiraLink, branchPattern, jiraDomain);
+    var registeredEvents = registerEvents(context);
 
     context.subscriptions.push(registeredEvents);
-    context.subscriptions.push(jiraLink);
 }
