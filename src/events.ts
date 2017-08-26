@@ -12,10 +12,10 @@ export default function registerCommands(context: ExtensionContext) {
         () => jiraLink.browse());
 
     const jiraDomainCmd = register('jira-link.setJiraDomain',
-        () => jiraDomain.showInputBox(context.workspaceState, update));
+        () => jiraDomain.showInputBox(update));
 
     const branchPatternCmd = register('jira-link.setBranchPattern', 
-        () => branchPattern.showInputBox(context.workspaceState, update));
+        () => branchPattern.showInputBox(update));
 
     return Disposable.from(
         updateEvent,

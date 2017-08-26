@@ -1,22 +1,16 @@
-import { Memento, window } from 'vscode';
+import { window } from 'vscode';
+import * as stateManager from '../state-manager';
 
-const _branchPatternStorageKey: string = "branch-pattern";
-
-export function extractStoryNumber(state: Memento, branchName: string): string {
-    var match = get(state).exec(branchName);
+export function extractStoryNumber(branchName: string): string {
+    var match = get().exec(branchName);
     while(match === null) {
         return "";
     }
     return match[1];
 }
 
-export function get(state: Memento): RegExp {
-    var branchPattern = state.get<string>(_branchPatternStorageKey, "");
-    return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/([a-zA-Z]{1,4}\-?[0-9]{1,4})/i;    
-}
-
-export function showInputBox(state: Memento, callback: Function) {
-    var currentBranchPattern = get(state);
+export function showInputBox(callback: Function) {
+    var currentBranchPattern = get();
 
     window
         .showInputBox(
@@ -27,18 +21,25 @@ export function showInputBox(state: Memento, callback: Function) {
         .then((value) => {
             if (typeof value == 'undefined') return;
 
-            state
-                .update(_branchPatternStorageKey, value)
-                .then(
-                    (isSuccessful) => {
-                        if (isSuccessful) {
-                            var updatedValue = value.length > 0 ? 
-                                `GIT branch pattern is updated as ${value}` : 
-                                "GIT branch pattern is restored to default.";
-                            window.showInformationMessage(`GIT branch pattern is updated as ${value}`);
-                            callback();
-                        }
+            update(value)
+            .then(
+                (isSuccessful) => {
+                    if (isSuccessful) {
+                        var updatedValue = value.length > 0 ? 
+                            `GIT branch pattern is updated as ${value}` : 
+                            "GIT branch pattern is restored to default.";
+                        window.showInformationMessage(`GIT branch pattern is updated as ${value}`);
+                        callback();
                     }
-                );
+                }
+            );
         });
+}
+
+export function get(): RegExp {
+    return stateManager.getBranchPattern();
+}
+
+function update(value): Thenable<void> {
+    return stateManager.updateBranchPattern(value);
 }

@@ -1,4 +1,4 @@
-import { ExtensionContext, Memento, StatusBarAlignment, window, workspace } from 'vscode';
+import { ExtensionContext, workspace } from 'vscode';
 import getCurrentBranch from './git';
 import * as branchPattern from './config/branch-pattern';
 import * as jiraDomain from './config/jira-domain';
@@ -7,7 +7,7 @@ import urlBuilder from './url-builder';
 var opn = require('opn');
 
 export function initialize(context: ExtensionContext) {
-    jiraDomain.initialize(context.workspaceState, () => update(context));
+    jiraDomain.initialize(() => update(context));
 }
 
 export function update(context) {
@@ -21,14 +21,14 @@ export let browse;
 
 const updateStatusBar = (context, branchName) => {
 
-    const jiraDomainUrl = () => jiraDomain.get(context.workspaceState);
+    const jiraDomainUrl = () => jiraDomain.get();
 
     let url = urlBuilder(
-        () => branchPattern.extractStoryNumber(context.workspaceState, branchName), 
+        () => branchPattern.extractStoryNumber(branchName), 
         () => jiraDomainUrl());
     
     if (url.length === 0) {
-        const storyNumber = branchPattern.get(context.workspaceState).source;
+        const storyNumber = branchPattern.get().source;
         statusBar.error(branchName, storyNumber, context.subscriptions);
         browse = () => opn(jiraDomainUrl());
         return;

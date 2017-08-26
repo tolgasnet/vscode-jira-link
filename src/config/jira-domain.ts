@@ -1,45 +1,47 @@
-import { Memento, window } from 'vscode';
+import { window } from 'vscode';
+import * as stateManager from '../state-manager';
 
-    const _jiraUriStorageKey: string = "jira-uri";
-
-    export function initialize(state: Memento, update: Function) {
-        var jiraDomain = get(state);
-        if (jiraDomain.length === 0) {
-            showInputBox(state, () => update());
-            return;
-        }
-
-        update();
+export function initialize(update: Function) {
+    var jiraDomain = get();
+    if (jiraDomain.length === 0) {
+        showInputBox(() => update());
+        return;
     }
 
-    export function showInputBox(state: Memento, callback: Function) {
-        var jiraBaseUri = get(state);
-        var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
-        var domainFragmentEndIndex = defaultUri.indexOf(".");
+    update();
+}
 
-        window
-            .showInputBox(
-            {
-                value: defaultUri,
-                valueSelection: [8, domainFragmentEndIndex],
-                prompt: "Enter your JIRA host base url"
-            })
-            .then((value) => {
-                if (typeof value == 'undefined') return;
+export function showInputBox(callback: Function) {
+    var jiraBaseUri = get();
+    var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
+    var domainFragmentEndIndex = defaultUri.indexOf(".");
 
-                state
-                    .update(_jiraUriStorageKey, value)
-                    .then(
-                        (isSuccessful) => {
-                            if (isSuccessful) {
-                                window.showInformationMessage(`JIRA base url is updated as ${value}`);
-                                callback();
-                            }
+    window
+        .showInputBox(
+        {
+            value: defaultUri,
+            valueSelection: [8, domainFragmentEndIndex],
+            prompt: "Enter your JIRA host base url"
+        })
+        .then((value) => {
+            if (typeof value == 'undefined') return;
+
+            update(value)
+                .then(
+                    (isSuccessful) => {
+                        if (isSuccessful) {
+                            window.showInformationMessage(`JIRA base url is updated as ${value}`);
+                            callback();
                         }
-                    );
-            });
-    }
+                    }
+                );
+        });
+}
 
-    export function get(state: Memento): string {
-        return state.get<string>(_jiraUriStorageKey, "");
-    }
+export function get(): string {
+    return stateManager.getJiraDomain();
+}
+
+function update(value): Thenable<void> {
+    return stateManager.updateJiraDomain(value);
+}
