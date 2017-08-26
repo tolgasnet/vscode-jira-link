@@ -3,36 +3,26 @@ import { JiraLink } from './jira-link';
 import { BranchPattern } from './config/branch-pattern';
 import { JiraDomain } from './config/jira-domain';
 
-export class Events {
+export default function registerCommands(jiraLink, branchPattern, jiraDomain) {
     
-        private _jiraLink: JiraLink;
-        private _subscriptions: Disposable[] = [];
-        private _branchPattern: BranchPattern;
-        private _jiraDomain: JiraDomain;
-    
-        constructor(jiraLink: JiraLink, branchPattern: BranchPattern, jiraDomain: JiraDomain) {
-            this._jiraLink = jiraLink;
-            this._branchPattern = branchPattern;
-            this._jiraDomain = jiraDomain;
-    
-            window.onDidChangeActiveTextEditor(this._jiraLink.update, this, this._subscriptions);
+    const updateEvent = window.onDidChangeActiveTextEditor(jiraLink.update);
 
-            this.registerCommand('jira-link.browse',
-                () => this._jiraLink.browse());
+    const browseCmd = register('jira-link.browse',
+        () => jiraLink.browse());
 
-            this.registerCommand('jira-link.setJiraDomain',
-                () => this._jiraDomain.showInputBox(() => this._jiraLink.update()));
+    const jiraDomainCmd = register('jira-link.setJiraDomain',
+        () => jiraDomain.showInputBox(() => jiraLink.update()));
 
-            this.registerCommand('jira-link.setBranchPattern', 
-                () => this._branchPattern.showInputBox(() => this._jiraLink.update()));
-        }
-    
-        public dispose() {
-            Disposable.from(...this._subscriptions).dispose();
-        }
+    const branchPatternCmd = register('jira-link.setBranchPattern', 
+        () => branchPattern.showInputBox(() => jiraLink.update()));
 
-        private registerCommand(command: string, callback: (...args: any[]) => any) {
-            var disposible = commands.registerCommand(command, callback, this);
-            this._subscriptions.push(disposible);
-        }
-    }
+    return Disposable.from(
+        updateEvent,
+        browseCmd,
+        jiraDomainCmd,
+        branchPatternCmd);
+}
+
+const register = (command, callback) => {
+    return commands.registerCommand(command, callback);
+};
