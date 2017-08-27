@@ -11,10 +11,11 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [ "${workspaceRoot}/out/src/**/*.js" ],
+            "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": "npm"
         },
         {
-            "name": "Launch Tests",
+            "name": "Launch Integration Tests",
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
@@ -22,7 +23,23 @@
             "stopOnEntry": false,
             "sourceMaps": true,
             "outFiles": [ "${workspaceRoot}/out/test-integration/**/*.js" ],
+            "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": "npm"
+        },
+        {
+            "name": "Mocha Tests",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--timeout",
+                "999999",
+                "--colors", 
+                "${workspaceRoot}/out/test/**/*.test.js" 
+            ],
+            "cwd": "${workspaceRoot}",
+            "internalConsoleOptions": "openOnSessionStart",
+            "outFiles": []
         }
     ]
 }

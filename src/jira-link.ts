@@ -1,5 +1,5 @@
 import { ExtensionContext, workspace } from 'vscode';
-import getCurrentBranch from './git';
+import * as git from './git';
 import * as branchPattern from './config/branch-pattern';
 import * as jiraDomain from './config/jira-domain';
 import * as statusBar from './status-bar';
@@ -11,7 +11,7 @@ export function initialize(context: ExtensionContext) {
 }
 
 export function update() {
-    getCurrentBranch(
+    git.getCurrentBranch(
         workspace.rootPath,
         (branchName) => updateStatusBar(branchName)
     );

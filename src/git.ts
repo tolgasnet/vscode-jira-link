@@ -1,9 +1,10 @@
-var exec = require('child_process').exec;
+var proc = require('child_process');
 
-export default function getCurrentBranch(directory, callback) {
+export function getCurrentBranch(directory, callback) {
     const cmd = 'git rev-parse --abbrev-ref HEAD';
-    exec(cmd, { cwd: directory }, function (err, stdout, stderr) {
+    const execDone = (err, stdout, stderr) => {
         let branchName = stdout.split('\n').join('');
         callback(branchName);
-    });
+    };
+    proc.exec(cmd, { cwd: directory }, execDone);
 }
