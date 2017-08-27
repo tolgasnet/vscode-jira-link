@@ -7,19 +7,19 @@ import urlBuilder from './url-builder';
 var opn = require('opn');
 
 export function initialize(context: ExtensionContext) {
-    jiraDomain.initialize(() => update(context));
+    jiraDomain.initialize(() => update());
 }
 
-export function update(context) {
+export function update() {
     getCurrentBranch(
         workspace.rootPath,
-        (branchName) => updateStatusBar(context, branchName)
+        (branchName) => updateStatusBar(branchName)
     );
 }
 
 export let browse;
 
-const updateStatusBar = (context, branchName) => {
+const updateStatusBar = (branchName) => {
 
     const jiraDomainUrl = () => jiraDomain.get();
 

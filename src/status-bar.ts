@@ -1,7 +1,7 @@
 import { StatusBarItem, StatusBarAlignment, window } from 'vscode';
 import * as stateManager from './state-manager';
 
-let statusBarItem: StatusBarItem;
+export let statusBarItem: StatusBarItem;
 
 export const initialize = () => {
     statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);

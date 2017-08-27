@@ -6,7 +6,7 @@ import * as stateManager from './state-manager';
 
 export function register(context: ExtensionContext) {
 
-    const update = () => jiraLink.update(context);
+    const update = () => jiraLink.update();
     const updateEvent = window.onDidChangeActiveTextEditor(update, null, stateManager.subscriptions);
 
     const browseCmd = registerCommand('jira-link.browse',
@@ -20,7 +20,7 @@ export function register(context: ExtensionContext) {
 }
 
 const update = (context) => {
-    jiraLink.update(context);
+    jiraLink.update();
 };
 
 const registerCommand = (command, callback) => {

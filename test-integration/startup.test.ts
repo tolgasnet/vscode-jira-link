@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { expect } from 'chai';
 import * as stateManager from '../src/state-manager';
 
-suite("Extension", () => {
+suite("Extension at startup", () => {
 
     const extensionId = "tolgasofuoglu.jira-link";
 
