@@ -15,9 +15,9 @@ export function show(jiraUrl: string) {
     statusBarItem.show();
 }
 
-export function error(branchName: string, storyNumber: string) {
+export function error(branchName: string, branchPattern: string) {
     statusBarItem.command = "jira-link.browse";
     statusBarItem.text = `$(issue-opened) JIRA`;
-    statusBarItem.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${storyNumber}`;
+    statusBarItem.tooltip = `Error parsing branch <${branchName}> with the branch pattern: ${branchPattern}`;
     statusBarItem.show();
 }
