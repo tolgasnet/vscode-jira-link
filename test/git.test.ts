@@ -1,35 +1,40 @@
 import { expect } from 'chai';
-import * as proxyquire from 'proxyquire';
+import * as sinon from 'sinon';
+import * as git from '../src/git';
+var proc = require('child_process');
 
 describe("git", () => {
+
+    afterEach(() => {
+        proc.exec.restore();
+    });
+
     it("should set the project directory", () => {
         
         const directory = "anyDirectory";
         const expectedBranchName = "1";
-    
-        let callback = () => {};
-        let execStub: any = (cmd, options, execDone) => {
-            expect(options.cwd).to.equal(directory);
-        };
 
-        git(execStub).getCurrentBranch(directory, () => {});
+        fakeExec((cmd, options, execDone) => {
+            expect(options.cwd).to.equal(directory);
+        });
+
+        git.getCurrentBranch(directory, () => {});
     });
 
     it("get the branch name back", () => {
         
         const expectedBranchName = "myBranch";
     
-        let callback = (branchName) => {};
-        let execStub: any = (cmd, options, execDone) => {
+        fakeExec((cmd, options, execDone) => {
             execDone("", expectedBranchName,"");
-        };
+        });
 
-        git(execStub).getCurrentBranch("", (branchName) => {
+        git.getCurrentBranch("", (branchName) => {
             expect(branchName).to.equal(expectedBranchName);
         });
     });
 
-    const git = (execStub) => {
-        return proxyquire('../src/git', { 'child_process': { exec: execStub} });
+    const fakeExec = (fake) => {
+        sinon.stub(proc, "exec").callsFake(fake);
     }
 });
