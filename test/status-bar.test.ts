@@ -45,7 +45,26 @@ describe("status bar", () => {
         });
 
         it("should show status bar", () => {
-            // todo
+            const expectedUrl = "anyUrl";
+            
+            statusBar.show(expectedUrl);
+            
+            const item = statusBar.statusBarItem;
+            expect(item.command).to.equal("jira-link.browse");
+            expect(item.text).to.equal(`$(link-external) JIRA`);
+            expect(item.tooltip).to.equal(expectedUrl);
+        });
+
+        it("should show status barin error state", () => {
+            const branchName = "anyName";
+            const branchPattern = "anyPattern";
+            
+            statusBar.error(branchName, branchPattern);
+            
+            const item = statusBar.statusBarItem;
+            expect(item.command).to.equal("jira-link.browse");
+            expect(item.text).to.equal(`$(issue-opened) JIRA`);
+            expect(item.tooltip).to.equal(`Error parsing branch <${branchName}> with the branch pattern: ${branchPattern}`);
         });
     });
 
@@ -57,7 +76,7 @@ describe("status bar", () => {
     }
 
     const stubWrapper = () => {
-        sinon.stub(vscode, "createStatusBarItem").returns({});
+        sinon.stub(vscode, "createStatusBarItem").returns({ show: () => {}});
         sinon.stub(vscode, "leftAlign").returns(0);
     }
 });
