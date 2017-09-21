@@ -1,4 +1,4 @@
-import { window } from 'vscode';
+import * as vscode from '../vscode-wrapper';
 import * as stateManager from '../state-manager';
 
 export function extractStoryNumber(branchName: string): string {
@@ -12,7 +12,7 @@ export function extractStoryNumber(branchName: string): string {
 export function showInputBox(callback: Function) {
     var currentBranchPattern = get();
 
-    window
+    vscode
         .showInputBox(
         {
             value: currentBranchPattern.source,
@@ -28,7 +28,7 @@ export function showInputBox(callback: Function) {
                         var updatedValue = value.length > 0 ? 
                             `GIT branch pattern is updated as ${value}` : 
                             "GIT branch pattern is restored to default.";
-                        window.showInformationMessage(`GIT branch pattern is updated as ${value}`);
+                        vscode.showInformationMessage(`GIT branch pattern is updated as ${value}`);
                         callback();
                     }
                 }

@@ -1,7 +1,7 @@
-import { window } from 'vscode';
+import * as vscode from '../vscode-wrapper';
 import * as stateManager from '../state-manager';
 
-export function initialize(update: Function) {
+export function initialize(update) {
     var jiraDomain = get();
     if (jiraDomain.length === 0) {
         showInputBox(() => update());
@@ -16,7 +16,7 @@ export function showInputBox(callback: Function) {
     var defaultUri = jiraBaseUri && jiraBaseUri.length > 0 ? jiraBaseUri : "https://mydomain.atlassian.net";
     var domainFragmentEndIndex = defaultUri.indexOf(".");
 
-    window
+    vscode
         .showInputBox(
         {
             value: defaultUri,
@@ -30,7 +30,7 @@ export function showInputBox(callback: Function) {
                 .then(
                     (isSuccessful) => {
                         if (isSuccessful) {
-                            window.showInformationMessage(`JIRA base url is updated as ${value}`);
+                            vscode.showInformationMessage(`JIRA base url is updated as ${value}`);
                             callback();
                         }
                     }

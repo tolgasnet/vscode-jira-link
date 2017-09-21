@@ -10,7 +10,7 @@ export function activate(context: ExtensionContext) {
 
     stateManager.initialize(context);
 
-    jiraLink.initialize(context);
+    jiraLink.initialize();
 
     events.register(context);
 
