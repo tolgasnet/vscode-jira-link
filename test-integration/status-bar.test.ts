@@ -7,8 +7,6 @@ import * as git from '../src/git';
 
 suite("Statusbar link", () => {
 
-    const extensionId = "tolgasofuoglu.jira-link";
-
     suiteSetup((done) => {
         stateManager.updateJiraDomain("mydomain")
         .then(() => {

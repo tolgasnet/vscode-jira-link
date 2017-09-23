@@ -1,4 +1,5 @@
 import { ExtensionContext, Memento, Disposable } from 'vscode';
+import { defaultBranchPattern } from './default-branch-pattern';
 
 let state: Memento;
 const _jiraUriStorageKey: string = "jira-uri";
@@ -20,7 +21,7 @@ export function updateJiraDomain(value): Thenable<void> {
 
 export function getBranchPattern(): RegExp {
     var branchPattern = state.get<string>(_branchPatternStorageKey, "");
-    return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : /feature\/([a-zA-Z]{1,4}\-?[0-9]{1,4})/i;    
+    return branchPattern.length > 0 ? new RegExp(branchPattern, "i") : defaultBranchPattern;    
 }
 
 export function updateBranchPattern(value): Thenable<void> {
